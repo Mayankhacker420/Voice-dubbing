@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="200dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bubble_bg"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <View
+            android:id="@+id/orbView"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@drawable/orb_glow"
+            android:layout_marginEnd="8dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="AI Dubber"
+            android:textColor="#00F5FF"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnClose"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:text="X"
+            android:textSize="10sp"
+            android:padding="0dp"
+            android:background="@android:color/transparent"
+            android:textColor="#FF4444" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Listening..."
+        android:textColor="#AAFFFFFF"
+        android:textSize="11sp"
+        android:maxLines="2"
+        android:layout_marginTop="6dp" />
+
+    <Button
+        android:id="@+id/btnToggle"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:text="Pause"
+        android:textSize="11sp"
+        android:background="@drawable/btn_pause_bg"
+        android:textColor="#00F5FF"
+        android:layout_marginTop="8dp" />
+</LinearLayout>

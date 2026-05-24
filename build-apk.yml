@@ -1,0 +1,83 @@
+name: Build Release APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle-
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Generate release keystore
+        run: |
+          keytool -genkey -v \
+            -keystore app/release.keystore \
+            -keyalg RSA -keysize 2048 \
+            -validity 10000 \
+            -alias dubber_key \
+            -storepass dubber_release_2024 \
+            -keypass dubber_release_2024 \
+            -dname "CN=Hindi Dubber, OU=App, O=Dubber, L=City, S=State, C=IN"
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease --stacktrace
+        env:
+          KEYSTORE_PASSWORD: dubber_release_2024
+          KEY_ALIAS: dubber_key
+          KEY_PASSWORD: dubber_release_2024
+
+      - name: Upload APK as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Hindi-Dubber-release-apk
+          path: app/build/outputs/apk/release/*.apk
+          retention-days: 30
+
+      - name: Create Release
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0-${{ github.run_number }}
+          name: "Hindi Dubber v1.0 (Build ${{ github.run_number }})"
+          files: app/build/outputs/apk/release/*.apk
+          generate_release_notes: false
+          body: |
+            ## Hindi Dubber APK
+
+            **Target Language:** HI
+            **Source Language:** Auto Detect
+            **Android:** 10+ supported (API 29+), optimized for Android 15/16
+
+            ### Install Instructions
+            1. Download the APK file below
+            2. On your phone: Settings > Security > Install from Unknown Sources
+            3. Open the APK and install it
+            4. Grant all permissions (Overlay, Microphone, Media Projection, Notifications)
+            5. Tap Start Dubbing, open YouTube, enjoy Hindi dubbing!
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
